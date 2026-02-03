@@ -60,7 +60,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800 mb-1">✨ 클리닝 리포트 도구</h1>
-                <p class="text-slate-500 text-sm">제이스 제작</p>
+                <p class="text-slate-500 text-sm">제이스 제작.</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="downloadReport()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center shadow-lg shadow-blue-200">
@@ -101,14 +101,9 @@
         <div class="grid grid-cols-2 gap-6 p-8 report-grid">
             <!-- Before -->
             <div>
-                <!-- 
-                   [정렬 수정] 
-                   복잡한 Flex 구조와 뱃지를 모두 제거하고,
-                   단순한 Block 요소 + text-align: center로 변경하여
-                   html2canvas 저장 시 정렬 깨짐을 원천 차단했습니다.
-                -->
                 <div class="w-full text-center mb-4">
-                    <h3 class="text-slate-800 font-bold text-xl tracking-tight inline-block border-b-2 border-red-500 pb-1 px-2">클리닝 전</h3>
+                    <!-- 밑줄 삭제 및 텍스트 컬러(빨강) 적용 -->
+                    <h3 class="text-red-600 font-bold text-xl tracking-tight inline-block mb-1 px-2">클리닝 전</h3>
                 </div>
                 
                 <div onclick="document.getElementById('file-before').click()" class="image-container cursor-pointer group">
@@ -125,11 +120,9 @@
 
             <!-- After -->
             <div>
-                 <!-- 
-                   [정렬 수정] 
-                -->
                 <div class="w-full text-center mb-4">
-                    <h3 class="text-slate-800 font-bold text-xl tracking-tight inline-block border-b-2 border-green-500 pb-1 px-2">클리닝 후</h3>
+                    <!-- 밑줄 삭제 및 텍스트 컬러(초록) 적용 -->
+                    <h3 class="text-green-600 font-bold text-xl tracking-tight inline-block mb-1 px-2">클리닝 후</h3>
                 </div>
                 
                 <div onclick="document.getElementById('file-after').click()" class="image-container cursor-pointer group">
@@ -145,11 +138,18 @@
             </div>
         </div>
 
-        <!-- 하단 푸터 -->
+        <!-- 하단 푸터 (로고 영역) -->
         <div class="px-8 pb-10">
-            <div class="pt-6 border-t border-slate-100 flex justify-between items-center text-slate-400 text-[10px] uppercase tracking-wider font-medium">
-                <p>CLEANING SERVICE QUALITY REPORT</p>
-                <p>Quality Assurance Guaranteed</p>
+            <div class="pt-6 border-t border-slate-100 flex justify-end items-center">
+                <!-- 텍스트 삭제 후 이미지 업로드 영역 추가 -->
+                <div onclick="document.getElementById('file-footer').click()" class="w-32 h-16 border border-dashed border-slate-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden group transition-colors">
+                    <input type="file" id="file-footer" class="hidden" accept="image/*" onchange="handleImage(this, 'preview-footer')">
+                    <div id="placeholder-footer" class="text-center">
+                        <p class="text-[10px] text-slate-400 font-medium group-hover:text-blue-500">로고/인장</p>
+                        <p class="text-[8px] text-slate-300">Click to upload</p>
+                    </div>
+                    <img id="preview-footer" class="absolute top-0 left-0 w-full h-full object-contain hidden bg-white p-1">
+                </div>
             </div>
         </div>
     </div>
