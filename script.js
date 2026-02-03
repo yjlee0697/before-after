@@ -1,29 +1,14 @@
-        // 실시간 텍스트 동기화
-        const inputs = {
-            'input-brand': ['display-brand', 'footer-brand'],
-            'input-client': ['display-client'],
-            'input-date': ['display-date']
-        };
+       // 날짜 동기화
+        const dateInput = document.getElementById('input-date');
+        const dateDisplay = document.getElementById('display-date');
 
-        Object.keys(inputs).forEach(id => {
-            document.getElementById(id).addEventListener('input', function() {
-                const value = this.value;
-                inputs[id].forEach(targetId => {
-                    const el = document.getElementById(targetId);
-                    if (id === 'input-client') {
-                        el.innerText = '서비스 대상: ' + (value || '');
-                    } else if (id === 'input-date') {
-                        el.innerText = '작성일: ' + (value || '');
-                    } else {
-                        el.innerText = value || (id === 'input-brand' ? 'CLEANING REPORT' : '');
-                    }
-                });
-            });
+        dateInput.addEventListener('input', function() {
+            dateDisplay.innerText = this.value || '';
         });
 
         // 오늘 날짜 기본 설정
-        document.getElementById('input-date').valueAsDate = new Date();
-        document.getElementById('display-date').innerText = '작성일: ' + document.getElementById('input-date').value;
+        dateInput.valueAsDate = new Date();
+        dateDisplay.innerText = dateInput.value;
 
         // 이미지 처리 함수
         function handleImage(input, previewId) {
@@ -61,10 +46,9 @@
                     });
 
                     const link = document.createElement('a');
-                    const clientName = document.getElementById('input-client').value || 'report';
                     const date = document.getElementById('input-date').value;
                     
-                    link.download = `cleaning_report_${clientName}_${date}.png`;
+                    link.download = `cleaning_report_${date}.png`;
                     link.href = generatedCanvas.toDataURL('image/png', 1.0);
                     link.click();
 
@@ -74,7 +58,7 @@
                     console.error('다운로드 오류:', error);
                     toast.classList.add('opacity-0');
                 }
-            }, 500);
+            }, 800); 
         }
 
         function resetAll() {
