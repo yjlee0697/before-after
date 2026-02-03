@@ -1,4 +1,4 @@
-      // 날짜 동기화
+     // 날짜 동기화
         const dateInput = document.getElementById('input-date');
         const dateDisplay = document.getElementById('display-date');
 
