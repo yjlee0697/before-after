@@ -17,6 +17,7 @@
             max-width: 1000px;
             background: white;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
         /* 이미지 찌그러짐 방지를 위한 4:3 고정 비율 설정 */
         .image-container {
@@ -42,14 +43,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* 찌그러짐 방지의 핵심: 비율 유지하며 꽉 채움 */
             object-fit: cover; 
             display: block;
         }
-        @media (max-width: 640px) {
-            .report-grid {
-                grid-template-columns: 1fr;
-            }
+        /* 레이아웃 전환 애니메이션 */
+        .report-grid {
+            transition: all 0.3s ease;
         }
     </style>
 </head>
@@ -60,7 +59,7 @@
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800 mb-1">✨ 클리닝 리포트 도구</h1>
-                <p class="text-slate-500 text-sm">제이스 제작.</p>
+                <p class="text-slate-500 text-sm">제이스 제작</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="downloadReport()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center shadow-lg shadow-blue-200">
@@ -75,10 +74,28 @@
             </div>
         </div>
         
-        <div class="mt-6 pt-6 border-t border-slate-100">
+        <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col md:flex-row gap-8">
             <div class="max-w-xs">
-                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">작업 날짜 선택</label>
+                <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-tight">작업 날짜 선택</label>
                 <input type="date" id="input-date" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+            
+            <div class="flex-1">
+                <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-tight">리포트 레이아웃 선택</label>
+                <div class="flex gap-3">
+                    <button onclick="changeLayout('horizontal')" id="btn-horizontal" class="flex-1 py-2 px-4 rounded-md border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold text-sm transition-all flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        좌우 배치 (기본)
+                    </button>
+                    <button onclick="changeLayout('vertical')" id="btn-vertical" class="flex-1 py-2 px-4 rounded-md border-2 border-slate-200 bg-white text-slate-500 font-medium text-sm transition-all flex items-center justify-center gap-2 hover:border-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                        상하 배치
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -98,11 +115,11 @@
         </div>
 
         <!-- 이미지 비교 영역 -->
-        <div class="grid grid-cols-2 gap-6 p-8 report-grid">
+        <!-- grid-cols-2 클래스가 JS에 의해 제어됩니다 -->
+        <div id="image-grid" class="grid grid-cols-2 gap-6 p-8 report-grid">
             <!-- Before -->
             <div>
                 <div class="w-full text-center mb-4">
-                    <!-- 밑줄 삭제 및 텍스트 컬러(빨강) 적용 -->
                     <h3 class="text-red-600 font-bold text-xl tracking-tight inline-block mb-1 px-2">클리닝 전</h3>
                 </div>
                 
@@ -121,7 +138,6 @@
             <!-- After -->
             <div>
                 <div class="w-full text-center mb-4">
-                    <!-- 밑줄 삭제 및 텍스트 컬러(초록) 적용 -->
                     <h3 class="text-green-600 font-bold text-xl tracking-tight inline-block mb-1 px-2">클리닝 후</h3>
                 </div>
                 
@@ -138,17 +154,17 @@
             </div>
         </div>
 
-        <!-- 하단 푸터 (로고 영역) -->
+        <!-- 하단 푸터 (고정 로고 + 영문 문구) -->
         <div class="px-8 pb-10">
-            <div class="pt-6 border-t border-slate-100 flex justify-end items-center">
-                <!-- 텍스트 삭제 후 이미지 업로드 영역 추가 -->
-                <div onclick="document.getElementById('file-footer').click()" class="w-32 h-16 border border-dashed border-slate-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 relative overflow-hidden group transition-colors">
-                    <input type="file" id="file-footer" class="hidden" accept="image/*" onchange="handleImage(this, 'preview-footer')">
-                    <div id="placeholder-footer" class="text-center">
-                        <p class="text-[10px] text-slate-400 font-medium group-hover:text-blue-500">로고/인장</p>
-                        <p class="text-[8px] text-slate-300">Click to upload</p>
-                    </div>
-                    <img id="preview-footer" class="absolute top-0 left-0 w-full h-full object-contain hidden bg-white p-1">
+            <!-- justify-between으로 변경하여 양끝 정렬 -->
+            <div class="pt-6 border-t border-slate-100 flex justify-between items-end">
+                <!-- 왼쪽: 트렌비 로고 -->
+                 <img src="logo.png" alt="" width="300" height="100">
+
+                <!-- 오른쪽: 영문 품질 보증 문구 -->
+                <div class="text-right">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Cleaning Service Quality Report</p>
+                    <p class="text-[8px] text-slate-300 font-medium">Quality Assurance Guaranteed</p>
                 </div>
             </div>
         </div>
