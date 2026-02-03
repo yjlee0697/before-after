@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cleaning Report Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+        .report-canvas {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        /* 이미지 찌그러짐 방지를 위한 4:3 고정 비율 설정 */
+        .image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background-color: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-container:hover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .preview-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 찌그러짐 방지의 핵심: 비율 유지하며 꽉 채움 */
+            object-fit: cover; 
+            display: block;
+        }
+        @media (max-width: 640px) {
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10 flex flex-col items-center">
+
+    <!-- 제어 섹션 (상단) -->
+    <div class="w-full max-w-[1000px] mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 mb-1">✨ 클리닝 리포트 도구</h1>
+                <p class="text-slate-500 text-sm">이미지 위주의 간결한 전/후 비교 리포트를 생성합니다.</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="downloadReport()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center shadow-lg shadow-blue-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    이미지로 저장하기
+                </button>
+                <button onclick="resetAll()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 px-4 rounded-lg transition-colors">
+                    초기화
+                </button>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">업체명</label>
+                <input type="text" id="input-brand" placeholder="예: 깔끔클린" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">고객명/장소</label>
+                <input type="text" id="input-client" placeholder="예: 홍길동 고객님 / 거실" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">날짜</label>
+                <input type="date" id="input-date" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            </div>
+        </div>
+    </div>
+
+    <!-- 리포트 캔버스 -->
+    <div id="report-canvas" class="report-canvas rounded-2xl overflow-hidden border border-slate-100">
+        <!-- 헤더 -->
+        <div class="p-8 bg-slate-900 text-white flex justify-between items-end">
+            <div>
+                <h2 id="display-brand" class="text-3xl font-bold mb-2 tracking-tight">CLEANING REPORT</h2>
+                <p id="display-client" class="text-slate-400 font-light">서비스 대상: </p>
+            </div>
+            <div class="text-right">
+                <p id="display-date" class="text-slate-400 font-light text-sm">작성일: </p>
+            </div>
+        </div>
+
+        <!-- 이미지 비교 영역 -->
+        <div class="grid grid-cols-2 gap-6 p-8 report-grid">
+            <!-- Before -->
+            <div class="flex flex-col">
+                <div class="flex items-center justify-center mb-4 space-x-2">
+                    <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-widest">Before</span>
+                    <span class="text-slate-800 font-bold text-lg">클리닝 전</span>
+                </div>
+                <div onclick="document.getElementById('file-before').click()" class="image-container cursor-pointer group">
+                    <input type="file" id="file-before" class="hidden" accept="image/*" onchange="handleImage(this, 'preview-before')">
+                    <div id="placeholder-before" class="flex flex-col items-center text-slate-300 group-hover:text-blue-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="text-sm font-medium">사진 업로드</span>
+                    </div>
+                    <img id="preview-before" class="preview-img hidden">
+                </div>
+            </div>
+
+            <!-- After -->
+            <div class="flex flex-col">
+                <div class="flex items-center justify-center mb-4 space-x-2">
+                    <span class="bg-green-100 text-green-600 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-widest">After</span>
+                    <span class="text-slate-800 font-bold text-lg">클리닝 후</span>
+                </div>
+                <div onclick="document.getElementById('file-after').click()" class="image-container cursor-pointer group">
+                    <input type="file" id="file-after" class="hidden" accept="image/*" onchange="handleImage(this, 'preview-after')">
+                    <div id="placeholder-after" class="flex flex-col items-center text-slate-300 group-hover:text-blue-400 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="text-sm font-medium">사진 업로드</span>
+                    </div>
+                    <img id="preview-after" class="preview-img hidden">
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 푸터 (노트 영역 삭제됨) -->
+        <div class="px-8 pb-10">
+            <div class="pt-6 border-t border-slate-100 flex justify-between items-center text-slate-400 text-[10px] uppercase tracking-wider font-medium">
+                <p>© <span id="footer-brand" class="font-bold text-slate-500">Your Company</span> CLEANING SERVICE</p>
+                <p>Quality Assurance Guaranteed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메시지 알림 -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-8 py-4 rounded-xl opacity-0 transition-all pointer-events-none shadow-2xl translate-y-4">
+        <div class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            리포트 이미지를 생성하고 있습니다...
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
