@@ -57,10 +57,10 @@
 
     <!-- 제어 섹션 (상단) -->
     <div class="w-full max-w-[1000px] mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800 mb-1">✨ 클리닝 리포트 도구</h1>
-                <p class="text-slate-500 text-sm">이미지 위주의 간결한 전/후 비교 리포트를 생성합니다.</p>
+                <p class="text-slate-500 text-sm">영어 뱃지를 제거하고 텍스트만 남겨 정렬을 최적화했습니다.</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="downloadReport()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center shadow-lg shadow-blue-200">
@@ -75,17 +75,9 @@
             </div>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">업체명</label>
-                <input type="text" id="input-brand" placeholder="예: 깔끔클린" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">고객명/장소</label>
-                <input type="text" id="input-client" placeholder="예: 홍길동 고객님 / 거실" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">날짜</label>
+        <div class="mt-6 pt-6 border-t border-slate-100">
+            <div class="max-w-xs">
+                <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-tight">작업 날짜 선택</label>
                 <input type="date" id="input-date" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
             </div>
         </div>
@@ -94,24 +86,31 @@
     <!-- 리포트 캔버스 -->
     <div id="report-canvas" class="report-canvas rounded-2xl overflow-hidden border border-slate-100">
         <!-- 헤더 -->
-        <div class="p-8 bg-slate-900 text-white flex justify-between items-end">
+        <div class="p-8 bg-slate-900 text-white flex justify-between items-center">
             <div>
-                <h2 id="display-brand" class="text-3xl font-bold mb-2 tracking-tight">CLEANING REPORT</h2>
-                <p id="display-client" class="text-slate-400 font-light">서비스 대상: </p>
+                <h2 class="text-3xl font-bold tracking-tight">CLEANING REPORT</h2>
+                <p class="text-slate-400 font-light text-sm mt-1 uppercase tracking-widest">Visual Work Record</p>
             </div>
             <div class="text-right">
-                <p id="display-date" class="text-slate-400 font-light text-sm">작성일: </p>
+                <p id="display-date" class="text-white font-medium text-lg"></p>
+                <p class="text-slate-500 text-[10px] uppercase">Service Date</p>
             </div>
         </div>
 
         <!-- 이미지 비교 영역 -->
         <div class="grid grid-cols-2 gap-6 p-8 report-grid">
             <!-- Before -->
-            <div class="flex flex-col">
-                <div class="flex items-center justify-center mb-4 space-x-2">
-                    <span class="bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-widest">Before</span>
-                    <span class="text-slate-800 font-bold text-lg">클리닝 전</span>
+            <div>
+                <!-- 
+                   [정렬 수정] 
+                   복잡한 Flex 구조와 뱃지를 모두 제거하고,
+                   단순한 Block 요소 + text-align: center로 변경하여
+                   html2canvas 저장 시 정렬 깨짐을 원천 차단했습니다.
+                -->
+                <div class="w-full text-center mb-4">
+                    <h3 class="text-slate-800 font-bold text-xl tracking-tight inline-block border-b-2 border-red-500 pb-1 px-2">클리닝 전</h3>
                 </div>
+                
                 <div onclick="document.getElementById('file-before').click()" class="image-container cursor-pointer group">
                     <input type="file" id="file-before" class="hidden" accept="image/*" onchange="handleImage(this, 'preview-before')">
                     <div id="placeholder-before" class="flex flex-col items-center text-slate-300 group-hover:text-blue-400 transition-colors">
@@ -125,11 +124,14 @@
             </div>
 
             <!-- After -->
-            <div class="flex flex-col">
-                <div class="flex items-center justify-center mb-4 space-x-2">
-                    <span class="bg-green-100 text-green-600 text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-widest">After</span>
-                    <span class="text-slate-800 font-bold text-lg">클리닝 후</span>
+            <div>
+                 <!-- 
+                   [정렬 수정] 
+                -->
+                <div class="w-full text-center mb-4">
+                    <h3 class="text-slate-800 font-bold text-xl tracking-tight inline-block border-b-2 border-green-500 pb-1 px-2">클리닝 후</h3>
                 </div>
+                
                 <div onclick="document.getElementById('file-after').click()" class="image-container cursor-pointer group">
                     <input type="file" id="file-after" class="hidden" accept="image/*" onchange="handleImage(this, 'preview-after')">
                     <div id="placeholder-after" class="flex flex-col items-center text-slate-300 group-hover:text-blue-400 transition-colors">
@@ -143,10 +145,10 @@
             </div>
         </div>
 
-        <!-- 하단 푸터 (노트 영역 삭제됨) -->
+        <!-- 하단 푸터 -->
         <div class="px-8 pb-10">
             <div class="pt-6 border-t border-slate-100 flex justify-between items-center text-slate-400 text-[10px] uppercase tracking-wider font-medium">
-                <p>© <span id="footer-brand" class="font-bold text-slate-500">Your Company</span> CLEANING SERVICE</p>
+                <p>CLEANING SERVICE QUALITY REPORT</p>
                 <p>Quality Assurance Guaranteed</p>
             </div>
         </div>
