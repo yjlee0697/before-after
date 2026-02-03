@@ -1,4 +1,4 @@
-       // 날짜 동기화
+      // 날짜 동기화
         const dateInput = document.getElementById('input-date');
         const dateDisplay = document.getElementById('display-date');
 
@@ -9,6 +9,44 @@
         // 오늘 날짜 기본 설정
         dateInput.valueAsDate = new Date();
         dateDisplay.innerText = dateInput.value;
+
+        // 레이아웃 변경 함수
+        function changeLayout(type) {
+            const grid = document.getElementById('image-grid');
+            const btnHorizontal = document.getElementById('btn-horizontal');
+            const btnVertical = document.getElementById('btn-vertical');
+            const canvas = document.getElementById('report-canvas');
+
+            if (type === 'horizontal') {
+                // 그리드 변경
+                grid.classList.add('grid-cols-2');
+                grid.classList.remove('grid-cols-1');
+                
+                // 캔버스 폭 조정 (가로형)
+                canvas.style.maxWidth = '1000px';
+
+                // 버튼 스타일
+                btnHorizontal.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'font-bold');
+                btnHorizontal.classList.remove('border-slate-200', 'bg-white', 'text-slate-500', 'font-medium');
+                
+                btnVertical.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'font-bold');
+                btnVertical.classList.add('border-slate-200', 'bg-white', 'text-slate-500', 'font-medium');
+            } else {
+                // 그리드 변경
+                grid.classList.remove('grid-cols-2');
+                grid.classList.add('grid-cols-1');
+
+                // 캔버스 폭 조정 (세로형 - 모바일 최적화 느낌으로 살짝 좁게)
+                canvas.style.maxWidth = '700px';
+
+                // 버튼 스타일
+                btnVertical.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'font-bold');
+                btnVertical.classList.remove('border-slate-200', 'bg-white', 'text-slate-500', 'font-medium');
+                
+                btnHorizontal.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'font-bold');
+                btnHorizontal.classList.add('border-slate-200', 'bg-white', 'text-slate-500', 'font-medium');
+            }
+        }
 
         // 이미지 처리 함수
         function handleImage(input, previewId) {
@@ -21,7 +59,7 @@
                     
                     img.src = e.target.result;
                     img.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
+                    if (placeholder) placeholder.classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
             }
@@ -47,8 +85,9 @@
 
                     const link = document.createElement('a');
                     const date = document.getElementById('input-date').value;
+                    const layout = document.getElementById('image-grid').classList.contains('grid-cols-1') ? 'vertical' : 'horizontal';
                     
-                    link.download = `cleaning_report_${date}.png`;
+                    link.download = `cleaning_report_${layout}_${date}.png`;
                     link.href = generatedCanvas.toDataURL('image/png', 1.0);
                     link.click();
 
