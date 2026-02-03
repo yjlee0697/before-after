@@ -14,10 +14,11 @@
         }
         .report-canvas {
             width: 100%;
-            max-width: 1000px;
+            /* 상하 배치에 최적화된 너비로 고정 */
+            max-width: 700px;
             background: white;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            margin: 0 auto; /* 중앙 정렬 */
         }
         /* 이미지 찌그러짐 방지를 위한 4:3 고정 비율 설정 */
         .image-container {
@@ -46,20 +47,16 @@
             object-fit: cover; 
             display: block;
         }
-        /* 레이아웃 전환 애니메이션 */
-        .report-grid {
-            transition: all 0.3s ease;
-        }
     </style>
 </head>
 <body class="p-4 md:p-10 flex flex-col items-center">
 
     <!-- 제어 섹션 (상단) -->
-    <div class="w-full max-w-[1000px] mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+    <div class="w-full max-w-[700px] mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800 mb-1">✨ 클리닝 리포트 도구</h1>
-                <p class="text-slate-500 text-sm">제이스 제작</p>
+                <p class="text-slate-500 text-sm">상하 배치(세로형) 리포트가 생성됩니다.</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="downloadReport()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg transition-all flex items-center shadow-lg shadow-blue-200">
@@ -74,28 +71,10 @@
             </div>
         </div>
         
-        <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col md:flex-row gap-8">
+        <div class="mt-6 pt-6 border-t border-slate-100">
             <div class="max-w-xs">
                 <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-tight">작업 날짜 선택</label>
                 <input type="date" id="input-date" class="w-full px-4 py-2 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-            </div>
-            
-            <div class="flex-1">
-                <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-tight">리포트 레이아웃 선택</label>
-                <div class="flex gap-3">
-                    <button onclick="changeLayout('horizontal')" id="btn-horizontal" class="flex-1 py-2 px-4 rounded-md border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold text-sm transition-all flex items-center justify-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
-                        좌우 배치 (기본)
-                    </button>
-                    <button onclick="changeLayout('vertical')" id="btn-vertical" class="flex-1 py-2 px-4 rounded-md border-2 border-slate-200 bg-white text-slate-500 font-medium text-sm transition-all flex items-center justify-center gap-2 hover:border-slate-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                        </svg>
-                        상하 배치
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -115,8 +94,8 @@
         </div>
 
         <!-- 이미지 비교 영역 -->
-        <!-- grid-cols-2 클래스가 JS에 의해 제어됩니다 -->
-        <div id="image-grid" class="grid grid-cols-2 gap-6 p-8 report-grid">
+        <!-- grid-cols-1로 고정하여 상하 배치 적용 -->
+        <div id="image-grid" class="grid grid-cols-1 gap-6 p-8 report-grid">
             <!-- Before -->
             <div>
                 <div class="w-full text-center mb-4">
@@ -156,10 +135,22 @@
 
         <!-- 하단 푸터 (고정 로고 + 영문 문구) -->
         <div class="px-8 pb-10">
-            <!-- justify-between으로 변경하여 양끝 정렬 -->
             <div class="pt-6 border-t border-slate-100 flex justify-between items-end">
-                <!-- 왼쪽: 트렌비 로고 -->
-                 <img src="logo.png" alt="" width="300" height="100">
+                <!-- 왼쪽: 로고 이미지 영역 (img 태그 활용 - 트렌비 로고 기본 적용) -->
+                <div class="h-10 flex items-center group relative">
+                    <!-- src에 트렌비 로고 SVG Data URI 적용 -->
+                    <img id="footer-logo" 
+                         src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 40'%3E%3Ctext x='0' y='32' style='font-family:sans-serif;font-weight:900;font-size:38px;fill:%231e1e1e'%3Etren%3C/text%3E%3Ccircle cx='76' cy='13' r='4' fill='%237c3aed'/%3E%3Ccircle cx='76' cy='25' r='4' fill='%237c3aed'/%3E%3Ctext x='88' y='32' style='font-family:sans-serif;font-weight:900;font-size:38px;fill:%231e1e1e'%3Ebe%3C/text%3E%3C/svg%3E" 
+                         alt="tren:be Logo" 
+                         class="h-full object-contain cursor-pointer hover:opacity-75 transition-opacity"
+                         onclick="document.getElementById('file-logo').click()"
+                         title="클릭하여 로고 변경">
+                    <input type="file" id="file-logo" class="hidden" accept="image/*" onchange="handleImage(this, 'footer-logo')">
+                    <!-- 툴팁 -->
+                    <span class="absolute -top-8 left-0 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                        클릭하여 로고 변경
+                    </span>
+                </div>
 
                 <!-- 오른쪽: 영문 품질 보증 문구 -->
                 <div class="text-right">
