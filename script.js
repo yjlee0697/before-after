@@ -1,4 +1,4 @@
-// 날짜 동기화
+ // 날짜 동기화
         const dateInput = document.getElementById('input-date');
         const dateDisplay = document.getElementById('display-date');
 
@@ -16,11 +16,24 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const img = document.getElementById(previewId);
-                    const placeholder = document.getElementById(previewId.replace('preview', 'placeholder'));
+                    const el = document.getElementById(previewId);
                     
-                    img.src = e.target.result;
-                    img.classList.remove('hidden');
+                    // placeholder ID 찾기 (preview-X -> placeholder-X)
+                    // 만약 previewId 자체가 'footer-logo'처럼 'preview'를 포함하지 않으면 자기 자신이 나오므로 체크 필요
+                    const placeholderId = previewId.replace('preview', 'placeholder');
+                    // ID가 바뀌지 않았다면 placeholder가 없는 것으로 간주 (자기 자신을 숨기지 않도록)
+                    const placeholder = (previewId !== placeholderId) ? document.getElementById(placeholderId) : null;
+                    
+                    // 태그 종류에 따라 이미지 처리 방식 분기
+                    if (el.tagName === 'IMG') {
+                        // 로고 등 일반 IMG 태그
+                        el.src = e.target.result;
+                    } else {
+                        // DIV 태그: 배경 이미지로 설정하여 비율 유지 및 크롭 (Cover) 효과 적용
+                        el.style.backgroundImage = `url(${e.target.result})`;
+                    }
+                    
+                    el.classList.remove('hidden');
                     if (placeholder) placeholder.classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
