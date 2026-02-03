@@ -139,13 +139,8 @@
                 <!-- 왼쪽: 로고 이미지 영역 (img 태그 활용 - 트렌비 로고 기본 적용) -->
                 <div class="h-10 flex items-center group relative">
                     <!-- src에 트렌비 로고 SVG Data URI 적용 -->
-                    <img id="footer-logo" 
-                         src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 40'%3E%3Ctext x='0' y='32' style='font-family:sans-serif;font-weight:900;font-size:38px;fill:%231e1e1e'%3Etren%3C/text%3E%3Ccircle cx='76' cy='13' r='4' fill='%237c3aed'/%3E%3Ccircle cx='76' cy='25' r='4' fill='%237c3aed'/%3E%3Ctext x='88' y='32' style='font-family:sans-serif;font-weight:900;font-size:38px;fill:%231e1e1e'%3Ebe%3C/text%3E%3C/svg%3E" 
-                         alt="tren:be Logo" 
-                         class="h-full object-contain cursor-pointer hover:opacity-75 transition-opacity"
-                         onclick="document.getElementById('file-logo').click()"
-                         title="클릭하여 로고 변경">
-                    <input type="file" id="file-logo" class="hidden" accept="image/*" onchange="handleImage(this, 'footer-logo')">
+                    <img id="footer-logo" src="logo.png" alt="tren:be Logo">
+                    
                     <!-- 툴팁 -->
                     <span class="absolute -top-8 left-0 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
                         클릭하여 로고 변경
